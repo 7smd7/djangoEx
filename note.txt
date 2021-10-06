@@ -1,0 +1,16 @@
+1- make new url and view
+
+change \Yektanet\mangement_advertiser\urls.py and define new path with a new view \Yektanet\mangement_advertiser\views.py  and name.
+define app's urls in Yektanet\Yektanet\urls.py urlpatterns
+
+2.config database
+edit databases in Yektanet\Yektanet\settings.py
+
+3.install app
+push 'mangement_advertiser.apps.MangementAdvertiserConfig' to INSTALLED_APPS array in Yektanet\Yektanet\settings.py
+
+4. Change your models (in Yektanet\mangement_advertiser\models.py).
+
+5. Run python manage.py makemigrations to create migrations for those changes
+
+6. Run python manage.py migrate to apply those changes to the database.
