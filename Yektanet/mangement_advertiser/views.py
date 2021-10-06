@@ -1,5 +1,5 @@
-from .models import Question
-from .models import Choice
+from .models import Advertiser
+from .models import Ad
 from django.template import loader
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
