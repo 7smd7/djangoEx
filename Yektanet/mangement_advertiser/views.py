@@ -7,34 +7,24 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
-    return render(request, "index.html", context)
+    context = {'advertisers': []}
+    advertiser_list = Advertiser.objects.all()
+    for i in range(0,len(advertiser_list)):
+        temp= advertiser_list[i]
+        ad_list = advertiser_list[i].ad_set.all()
+        temp.ads = ad_list.values();
+        context['advertisers'].append(temp)
+        for j in range(0,len(ad_list)):
+            ad_list[j].incViews()
+        advertiser_list[i].save()
+    return render(request, "ads.html", context)
 
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'detail.html', {'question': question})
+def detail(request, advertiser_id):
+    advertiser = get_object_or_404(Advertiser, pk=advertiser_id)
+    return render(request, 'detail.html', {'advertiser': advertiser})
 
+def click(request, ad_id):
+    ad = get_object_or_404(Ad, pk=ad_id)
+    ad.incClicks()
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'results.html', {'question': question})
-
-
-def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        # Redisplay the question voting form.
-        return render(request, 'detail.html', {
-            'question': question,
-            'error_message': "You didn't select a choice.",
-        })
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse('mangement_advertiser:results', args=(question.id,)))
+    return HttpResponseRedirect(ad.link)

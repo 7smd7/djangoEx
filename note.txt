@@ -11,6 +11,6 @@ push 'mangement_advertiser.apps.MangementAdvertiserConfig' to INSTALLED_APPS arr
 
 4. Change your models (in Yektanet\mangement_advertiser\models.py).
 
-5. Run python manage.py makemigrations to create migrations for those changes
+5. Run ipython manage.py makemigrations to create migrations for those changes
 
-6. Run python manage.py migrate to apply those changes to the database.
+6. Run ipython manage.py migrate to apply those changes to the database.
