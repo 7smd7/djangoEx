@@ -1,12 +1,11 @@
-from .models import Advertiser
-from .models import Ad
+from .models import Advertiser, Ad, Click, View
 from django.template import loader
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-def index(request):
+def index(request,ip):
     context = {'advertisers': []}
     advertiser_list = Advertiser.objects.all()
     for i in range(0,len(advertiser_list)):
@@ -14,6 +13,9 @@ def index(request):
         ad_list = advertiser_list[i].ad_set.all()
         temp.ads = ad_list.values();
         context['advertisers'].append(temp)
+        for j in range(0,len(ad_list)):
+            view = View(ad = ad_list[j], ip=ip)
+            view.save()
         advertiser_list[i].save()
     return render(request, "ads.html", context)
 
@@ -33,7 +35,8 @@ def addad(request):
     ad.save()
     return HttpResponseRedirect('/mangement_advertiser/')
 
-def click(request, ad_id):
+def click(request, ad_id, ip):
     ad = get_object_or_404(Ad, pk=ad_id)
-
+    click = Click(ad=ad,ip=ip)
+    click.save()
     return HttpResponseRedirect(ad.link)

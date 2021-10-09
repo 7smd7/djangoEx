@@ -1,0 +1,11 @@
+<h1>New Ad</h1>
+
+<form action="{% url 'mangement_advertiser:addad' %}" method="post">
+    {% csrf_token %}
+    <input type="number" id="ad_id" name="ad_id" placeholder="id"><br>
+    <input type="text" id="title" name="title" placeholder="title"><br>
+    <input type="text" id="img_url" name="img_url" placeholder="image url"><br>
+    <input type="text" id="link" name="link" placeholder="link"><br>
+    <input type="number" id="advertiser_id" name="advertiser_id" placeholder="advertiser id"><br>
+    <input type="submit" value="newad">
+</form>
