@@ -5,8 +5,7 @@ from . import views
 
 app_name = 'mangement_advertiser'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('newad/', views.newad, name='newad'),
-    path('addad/', views.addad, name='addad'),
-    path('click/<int:ad_id>/', views.click, name='click'),
+    path('', views.Index.as_view(), name='index'),
+    path('newad/', views.AdFormView.as_view() , name='newad'),
+    path('click/<int:ad_id>/', views.ClickRedirectView.as_view(), name='click'),
 ]

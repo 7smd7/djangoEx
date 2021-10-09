@@ -7,7 +7,7 @@ class IpMiddleware:
         return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if (view_func.__name__=="click" or view_func.__name__=="index"):
+        if (view_func.__name__=="ClickRedirectView" or view_func.__name__=="Index"):
             view_kwargs['ip'] = self.get_client_ip(request)
 
     def get_client_ip(self,request):
