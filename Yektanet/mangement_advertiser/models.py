@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 class Advertiser(models.Model):
     id = models.BigIntegerField(primary_key=True)
@@ -36,15 +37,13 @@ class Ad(models.Model):
     views = models.IntegerField(default=0)
 
     def incClicks(self):
-        advertiser = Advertiser.objects.get(id=self.id)
-        advertiser.incClicks()
+        self.advertiser.incClicks()
         self.clicks += 1
         self.save()
 
 
     def incViews(self):
-        advertiser = Advertiser.objects.get(id=self.id)
-        advertiser.incViews()
+        self.advertiser.incViews()
         self.views += 1
         self.save()
 

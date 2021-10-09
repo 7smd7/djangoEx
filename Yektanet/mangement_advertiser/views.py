@@ -19,9 +19,21 @@ def index(request):
         advertiser_list[i].save()
     return render(request, "ads.html", context)
 
-def detail(request, advertiser_id):
-    advertiser = get_object_or_404(Advertiser, pk=advertiser_id)
-    return render(request, 'detail.html', {'advertiser': advertiser})
+def newad(request):
+    return render(request, 'newad.html', {})
+
+def addad(request):
+    req = dict(request.POST)
+    for i in req.keys():
+        req[i]=req[i][0]
+    req['ad_id'] = int(req['ad_id'])
+    req['advertiser_id'] = int(req['advertiser_id'])
+    if(Ad.objects.get(id = req['ad_id'])):
+        return HttpResponse("The id was used.")
+    advertiser = get_object_or_404(Advertiser, pk=req['advertiser_id'])
+    ad = Ad(id=req['ad_id'], advertiser = advertiser,title=req['title'],img_url=req['img_url'],link=req['link'])
+    ad.save()
+    return HttpResponseRedirect('/mangement_advertiser/')
 
 def click(request, ad_id):
     ad = get_object_or_404(Ad, pk=ad_id)
