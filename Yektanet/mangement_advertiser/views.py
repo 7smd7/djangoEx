@@ -14,8 +14,6 @@ def index(request):
         ad_list = advertiser_list[i].ad_set.all()
         temp.ads = ad_list.values();
         context['advertisers'].append(temp)
-        for j in range(0,len(ad_list)):
-            ad_list[j].incViews()
         advertiser_list[i].save()
     return render(request, "ads.html", context)
 
@@ -37,6 +35,5 @@ def addad(request):
 
 def click(request, ad_id):
     ad = get_object_or_404(Ad, pk=ad_id)
-    ad.incClicks()
 
     return HttpResponseRedirect(ad.link)
