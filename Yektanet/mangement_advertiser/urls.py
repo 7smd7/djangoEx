@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import include, path
 from django.views.generic.base import RedirectView
-
+from rest_framework import routers
 from . import views
+
+router = routers.SimpleRouter()
+router.register(r'ad', views.AdViewSet)
+router.register(r'advertiser', views.AdvertiserViewSet)
+router.register(r'clickAndView', views.ClickAndViewViewSet)
+router.register(r'click', views.ClickViewSet)
+router.register(r'view', views.ViewViewSet)
 
 app_name = 'mangement_advertiser'
 urlpatterns = [
@@ -11,4 +18,5 @@ urlpatterns = [
     path('query2/', views.Query2List.as_view() , name='query2'),
     path('query3/', views.Query3List.as_view() , name='query3'),
     path('click/<int:ad_id>/', views.ClickRedirectView.as_view(), name='click'),
+    path('api/', include((router.urls))),
 ]

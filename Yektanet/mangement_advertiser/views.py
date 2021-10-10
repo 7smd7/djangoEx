@@ -1,4 +1,7 @@
 from .models import Advertiser, Ad, Click, View, AbstractClickViews
+from .serializers import AdvertiserSerializers, AdSerializers, ClickSerializers, ViewSerializers, AbstractCVSerializers
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
 from django.template import loader
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -9,11 +12,11 @@ from django.views.generic.edit import CreateView
 from django.db.models import Count
 from django.db.models.functions import Trunc
 from itertools import chain, groupby
+from rest_framework import viewsets
 
 class Index(TemplateView):
     
     template_name = "ads.html"
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['advertisers'] =  []
@@ -95,3 +98,23 @@ class Query3List(TemplateView):
             sum += context['query'][i]['difference']
         context['avg']=sum/len(context['query'])
         return context
+
+class AdViewSet(viewsets.ModelViewSet):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializers
+
+class AdvertiserViewSet(viewsets.ModelViewSet):
+    queryset = Advertiser.objects.all()
+    serializer_class = AdvertiserSerializers
+
+class ClickAndViewViewSet(viewsets.ModelViewSet):
+    queryset = AbstractClickViews.objects.all()
+    serializer_class = AbstractCVSerializers
+
+class ClickViewSet(viewsets.ModelViewSet):
+    queryset = Click.objects.all()
+    serializer_class = ClickSerializers
+
+class ViewViewSet(viewsets.ModelViewSet):
+    queryset = View.objects.all()
+    serializer_class = ViewSerializers
