@@ -12,7 +12,12 @@ from django.views.generic.edit import CreateView
 from django.db.models import Count
 from django.db.models.functions import Trunc
 from itertools import chain, groupby
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
+from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
 
 class Index(TemplateView):
     
