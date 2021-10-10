@@ -20,7 +20,7 @@ class Index(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['advertisers'] =  []
-        advertiser_list = Advertiser.objects.all()
+        advertiser_list = Advertiser.objects.all().order_by('name')
         for i in range(0,len(advertiser_list)):
             temp= advertiser_list[i]
             ad_list = advertiser_list[i].ad_set.filter(approve = True)
