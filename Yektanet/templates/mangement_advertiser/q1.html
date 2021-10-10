@@ -19,27 +19,33 @@
     </div>
 </header>
 <body>
-<div class="container" dir="rtl">
-    {% for advertiser in advertisers %}
+    <div class="container" dir="">
         <div class="card mt-2 p-2">
-            <h5 class="card-title">{{ advertiser.name }}</h5>
-            <div class="card-body">
-                <div class="row">
-		    {% for ad in advertiser.ads %}
-		        <div class="card col-md-2 p-0 mx-2">
-		            <a href="click/{{ ad.id }}/">
-		                <img src="{{ ad.img_url }}"
-		                     class="card-img-top">
-		                <div class="card-body">
-		                    <span>{{ ad.title }}</span>
-		                </div>
-		            </a>
-		        </div>
-		    {% endfor %}
-                </div>
-            </div>
+            <h1>Query 1</h1>
+            <br>
+            <table>
+                <tr>
+                <th>time key</th>
+                <th>ad id</th>
+                <th>ad title</th>
+                <th>Count</th>
+                </tr>
+                {% for i in query %}
+                    <tr>
+                        <td>{{ i.key }}</td>
+                        <td>{{ i.ad }}</td>
+                        <td>{{ i.ad_title}}</td>
+                        <td>{{ i.count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
-    {% endfor %}
-</div>
+    </div>
 </body>
-</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          crossorigin="anonymous">
+    <title>Ad View</title>
+</head>
+<header>
+    <div class="container">
+        <div class="mt-2 p-2">
+            <a href='/mangement_advertiser/' class="btn btn-primary">Home</a>
+            <a href='/admin/mangement_advertiser/' class="btn btn-primary">Admin</a>
+            <a href='/mangement_advertiser/newad' class="btn btn-primary">New Ad</a>
+            <a href='/mangement_advertiser/query1' class="btn btn-primary">Query 1</a>
+            <a href='/mangement_advertiser/query2' class="btn btn-primary">Query 2</a>
+            <a href='/mangement_advertiser/query3' class="btn btn-primary">Query 3</a>
+        </div>
+    </div>
+</header>
+<body>
+    <div class="container" dir="">
+        <div class="card mt-2 p-2">
+            <h1>Query 3</h1>
+            <br>
+            <table>
+                <tr>
+                    <th>IP</th>
+                    <th>ad id</th>
+                    <th>ad title</th>
+                    <th>time difference</th>
+                </tr>
+                {% for i in query %}
+                    <tr>
+                        <td>{{ i.ip }}</td>
+                        <td>{{ i.ad }}</td>
+                        <td>{{ i.ad_title }}</td>
+                        <td>{{ i.difference }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                        <td>No i yet.</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <div>
+                <b>average difference: </b> {{avg}}
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,4 +1,4 @@
-from .models import Advertiser, Ad, Click, View
+from .models import Advertiser, Ad, Click, View, AbstractClickViews
 from django.template import loader
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView
+from django.db.models import Count
+from django.db.models.functions import Trunc
+from itertools import chain, groupby
 
 class Index(TemplateView):
     
@@ -42,3 +45,53 @@ class ClickRedirectView(RedirectView):
         click = Click(ad=ad,ip=kwargs['ip'])
         click.save()
         return super().get_redirect_url(*args, **kwargs)
+
+class Query1List(TemplateView):
+    template_name = 'q1.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = AbstractClickViews.objects.values('ad','time').annotate(key=Trunc('time', 'hour')).values('ad','key').annotate(count = Count('key')).order_by('key')
+        for i in range(len(context['query'])):
+            context['query'][i]['ad_title'] = Ad.objects.get(id=context['query'][i]['ad'])
+        return context
+
+class Query2List(TemplateView):
+    template_name = 'q2.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = []
+        a = Click.objects.values('ad','time').annotate(key=Trunc('time', 'hour')).values('ad','key').annotate(countClick = Count('key')).order_by('key')
+        b = View.objects.values('ad','time').annotate(key=Trunc('time', 'hour')).values('ad','key').annotate(countView = Count('key')).order_by('key')
+        result_list = list( sorted(chain(a,b),key=lambda row: (row['key'],row['ad'])))
+        for i in range(len(result_list)-1)[::-1]:
+            if (result_list[i]['key']==result_list[i+1]['key'] and result_list[i]['ad']==result_list[i+1]['ad']):
+                c = {**result_list[i],**result_list[i+1]}
+                context['query'].append(c)
+        for i in range(len(context['query'])):
+            context['query'][i]['ad_title'] = Ad.objects.get(id=context['query'][i]['ad'])
+            context['query'][i]['ratio'] = float("{:.3f}".format( context['query'][i]['countClick']/context['query'][i]['countView'] ))
+        return context
+
+class Query3List(TemplateView):
+    template_name = 'q3.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = []
+        a = Click.objects.values('ad','ip','time').annotate(countClick=Count('ad'))
+        b = View.objects.values('ad','ip','time').annotate(countView=Count('ad'))
+        result_list = list( sorted(chain(a,b),key=lambda row: (row['ip'],row['ad'],row['time'])))
+        for i in range(len(result_list)-1):
+            if (result_list[i]['ad']==result_list[i+1]['ad'] and 
+                result_list[i]['ip']==result_list[i+1]['ip'] and
+                'countView' in result_list[i].keys() and
+                'countClick' in result_list[i+1].keys()):
+                c = {'ad': result_list[i]['ad'], 'ip':result_list[i]['ip'],
+                    # 'timeView':result_list[i]['time'],'timeClick':result_list[i+1]['time'],
+                    'difference': result_list[i+1]['time']-result_list[i]['time']}
+                context['query'].append(c)
+        sum = context['query'][0]['difference']-context['query'][0]['difference']
+        for i in range(len(context['query'])):
+            context['query'][i]['ad_title'] = Ad.objects.get(id=context['query'][i]['ad'])
+            sum += context['query'][i]['difference']
+        context['avg']=sum/len(context['query'])
+        return context
