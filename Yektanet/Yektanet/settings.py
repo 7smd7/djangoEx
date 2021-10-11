@@ -35,7 +35,7 @@ CELERYBEAT_MAX_LOOP_INTERVAL = 50000
 CELERY_BEAT_SCHEDULE = {
     'save-report-hourly': { 
          'task': 'hourly', 
-         'schedule': 120,
+         'schedule': 3600,
         },          
     'save-report-daily': { 
          'task': 'daily', 

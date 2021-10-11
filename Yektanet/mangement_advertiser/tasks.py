@@ -10,7 +10,6 @@ logger = get_task_logger(__name__)
 
 @shared_task(name='hourly')
 def last_hour_report():
-    logger.info("hourly run")
     time = datetime.now(UTC) - timedelta(hours=1)
     clickCount = (View.objects.filter(time__gte=time).aggregate(Count('id'))['id__count'])
     clickReport = HourlyReport(type = "click", count = clickCount)
@@ -18,11 +17,11 @@ def last_hour_report():
     viewCount = (Click.objects.filter(time__gte=time).aggregate(Count('id'))['id__count'])
     viewReport = HourlyReport(type = "view", count = viewCount)
     viewReport.save()
+    logger.info("hourly finished. click: " + clickCount + " view: " + viewCount )
 
     
 @shared_task(name='daily')
 def last_day_report():
-    logger.info("daily run")
     time = datetime.now(UTC) - timedelta(days=1)
     clickCount = HourlyReport.objects.filter(timeKey__gte=time, type = "click").aggregate(Count('id'))['id__count']
     clickReport = HourlyReport(type = "click", count = clickCount)
@@ -30,3 +29,4 @@ def last_day_report():
     viewCount = HourlyReport.objects.filter(timeKey__gte=time, type = "view").aggregate(Count('id'))['id__count']
     viewReport = HourlyReport(type = "view", count = viewCount)
     viewReport.save()
+    logger.info("daily finished. click: " + clickCount + " view: " + viewCount )
