@@ -27,6 +27,32 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+from celery.schedules import crontab   
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//' 
+CELERY_TIMEZONE = 'Iran'   
+CELERYBEAT_MAX_LOOP_INTERVAL = 50000
+# Let's make things happen 
+CELERY_BEAT_SCHEDULE = {
+    'save-report-hourly': { 
+         'task': 'hourly', 
+         'schedule': 120,
+        },          
+    'save-report-daily': { 
+         'task': 'daily', 
+         'schedule': crontab(hour = "0", minute = "0"),
+        },          
+}
+
+# celery setting.
+CELERY_CACHE_BACKEND = 'default'
+
+# django setting.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
 
 # Application definition
 
@@ -40,6 +66,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 REST_FRAMEWORK = {

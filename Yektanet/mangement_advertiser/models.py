@@ -53,3 +53,14 @@ class Click(AbstractClickViews):
 class View(AbstractClickViews):
     pass
 
+class HourlyReport(models.Model):
+    id = AutoField(primary_key=True)
+    keyTime = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=10)
+    count = models.BigIntegerField()
+
+class DailyReport(models.Model):
+    id = AutoField(primary_key=True)
+    keyTime = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=10)
+    count = models.BigIntegerField()
