@@ -53,14 +53,20 @@ class Click(AbstractClickViews):
 class View(AbstractClickViews):
     pass
 
-class HourlyReport(models.Model):
+class AbstractReport(models.Model):
     id = AutoField(primary_key=True)
+    ad = models.ForeignKey(Ad,on_delete=models.CASCADE)
     keyTime = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=10)
     count = models.BigIntegerField()
 
-class DailyReport(models.Model):
-    id = AutoField(primary_key=True)
-    keyTime = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=10)
-    count = models.BigIntegerField()
+class DailyClickReport(AbstractReport):
+    pass
+
+class DailyViewReport(AbstractReport):
+    pass
+
+class HourlyClickReport(AbstractReport):
+    pass
+
+class HourlyViewReport(AbstractReport):
+    pass

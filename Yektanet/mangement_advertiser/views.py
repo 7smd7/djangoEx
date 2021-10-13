@@ -11,18 +11,21 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView
 from django.db.models import Count
 from django.db.models.functions import Trunc
+from django.db import connection
+from django.core import serializers
 from itertools import chain, groupby
 from rest_framework import viewsets, generics
 from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser
+from rest_framework.response import Response
 
 class ReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS
 
 class Index(TemplateView):
-    
     template_name = "ads.html"
     def get_context_data(self, **kwargs):
+        print()
         context = super().get_context_data(**kwargs)
         context['advertisers'] =  []
         advertiser_list = Advertiser.objects.all().order_by('name')
@@ -123,3 +126,54 @@ class ClickViewSet(viewsets.ModelViewSet):
 class ViewViewSet(viewsets.ModelViewSet):
     queryset = View.objects.all()
     serializer_class = ViewSerializers
+
+class QueriesViews(generics.ListAPIView):
+    queries = []
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        query1 = AbstractClickViews.objects.values('ad','time').annotate(key=Trunc('time', 'hour')).values('ad','key').annotate(count = Count('key')).order_by('key')
+        self.queries.append(query1)
+        query2={}
+        query2['sumAll'] = Click.objects.all().aggregate(count = Count('id'))['count']/View.objects.all().aggregate(count = Count('id'))['count']
+        with connection.cursor() as cursor:
+            query = '''
+                select time, CAST(c.countclick AS float)/CAST(k.countview AS float) as ratio from
+                (Select date_trunc('hour', a.time) as time ,count(*) as countClick from
+                (SELECT * FROM public.mangement_advertiser_click join public.mangement_advertiser_abstractclickviews on id = abstractclickviews_ptr_id) as a 
+                group by date_trunc('hour', a.time) order by date_trunc('hour', a.time)) as c
+                natural join
+                (Select date_trunc('hour', b.time) as time ,count(*) as countView from
+                (SELECT * FROM public.mangement_advertiser_view join public.mangement_advertiser_abstractclickviews on id = abstractclickviews_ptr_id) as b
+                group by date_trunc('hour', b.time) order by date_trunc('hour', b.time)) as k  order by time desc;
+            '''
+            cursor.execute(query)
+            query2['hourly'] = cursor.fetchall()
+        self.queries.append(query2)
+
+        query3={'query':[]}
+        a = Click.objects.values('ad','ip','time').annotate(countClick=Count('ad'))
+        b = View.objects.values('ad','ip','time').annotate(countView=Count('ad'))
+        result_list = list( sorted(chain(a,b),key=lambda row: (row['ip'],row['ad'],row['time'])))
+        for i in range(len(result_list)-1):
+            if (result_list[i]['ad']==result_list[i+1]['ad'] and 
+                result_list[i]['ip']==result_list[i+1]['ip'] and
+                'countView' in result_list[i].keys() and
+                'countClick' in result_list[i+1].keys()):
+                c = {'ad': result_list[i]['ad'], 'ip':result_list[i]['ip'],
+                    'difference': result_list[i+1]['time']-result_list[i]['time']}
+                query3['query'].append(c)
+        sum = query3['query'][0]['difference']-query3['query'][0]['difference']
+        for i in range(len(query3['query'])):
+            sum += query3['query'][i]['difference']
+        query3['avg']=sum/len(query3['query'])
+        self.queries.append(query3)
+
+    def list(self,request):
+        return Response(self.get_queryset())
+
+    def get_queryset(self):
+        return self.queries
+
+    def get(self,request, id):
+        return Response(self.queries[id-1])

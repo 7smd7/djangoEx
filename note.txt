@@ -14,3 +14,6 @@ push 'mangement_advertiser.apps.MangementAdvertiserConfig' to INSTALLED_APPS arr
 5. Run ipython manage.py makemigrations to create migrations for those changes
 
 6. Run ipython manage.py migrate to apply those changes to the database.
+
+celery -A Yektanet worker -l info -P gevent 
+celery -A Yektanet beat -l info -S django  

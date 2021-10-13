@@ -34,13 +34,10 @@ CELERYBEAT_MAX_LOOP_INTERVAL = 50000
 # Let's make things happen 
 CELERY_BEAT_SCHEDULE = {
     'save-report-hourly': { 
-         'task': 'hourly', 
-         'schedule': 3600,
+        'task': 'daily', 
+        'schedule': 10,
         },          
-    'save-report-daily': { 
-         'task': 'daily', 
-         'schedule': crontab(hour = "0", minute = "0"),
-        },          
+       
 }
 
 # celery setting.
